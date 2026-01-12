@@ -81,45 +81,6 @@
         }
         .btn-action:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.15); }
 
-        .slider-container {
-            width: 100%;
-            height: 200px;
-            border-radius: 1.5rem;
-            overflow: hidden;
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0,0,0,0.2);
-        }
-        .slider-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0; left: 0;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-        .slider-image.active { opacity: 1; }
-        .slider-dots {
-            position: absolute;
-            bottom: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 6px;
-        }
-        .dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transition: all 0.3s ease;
-        }
-        .dot.active {
-            background: var(--gold);
-            width: 15px;
-            border-radius: 10px;
-        }
-
         #editor-panel {
             position: fixed;
             top: 0; right: -100%;
@@ -149,6 +110,26 @@
         }
         .input-group input:focus { border-color: var(--gold); }
 
+        /* Estilo para los botones de upload */
+        .file-upload-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px dashed var(--gold);
+            border-radius: 8px;
+            color: var(--gold);
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 6px;
+            text-transform: uppercase;
+            transition: background 0.3s ease;
+        }
+        .file-upload-btn:hover { background: rgba(212, 175, 55, 0.2); }
+
         #btn-settings {
             position: fixed;
             top: 1.5rem; right: 1.5rem;
@@ -156,7 +137,7 @@
             background: rgba(212, 175, 55, 0.2);
             width: 50px; height: 50px;
             border-radius: 50%;
-            display: none; /* Oculto por defecto */
+            display: none;
             align-items: center; justify-content: center;
             backdrop-filter: blur(10px);
             border: 2px solid var(--gold);
@@ -189,7 +170,6 @@
         input:checked + .slider { background-color: var(--gold); }
         input:checked + .slider:before { transform: translateX(14px); }
 
-        /* Estilo para avisar del gesto */
         .admin-hint {
             position: fixed;
             bottom: 10px;
@@ -203,8 +183,8 @@
 <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3"
+    "react": "https://esm.sh/react@^19.2.3",
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
@@ -212,7 +192,7 @@
 <body>
 
     <button id="btn-settings" title="Abrir Configuración">
-        <i class="fa-solid fa-gear fa-spin-slow"></i>
+        <i class="fa-solid fa-gear"></i>
     </button>
 
     <aside id="editor-panel">
@@ -233,16 +213,36 @@
             </button>
         </div>
 
+        <!-- IDENTIDAD -->
         <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Identidad</h3>
         <div class="input-group"><label>Nombre</label><input type="text" data-key="name"></div>
         <div class="input-group"><label>Cargo</label><input type="text" data-key="role"></div>
         <div class="input-group"><label>Biografía</label><textarea data-key="bio" rows="2"></textarea></div>
+        
         <div class="input-group">
-            <label>URL de tu Foto</label>
-            <input type="text" data-key="photo" placeholder="Pega el link de una imagen">
+            <label>Foto de Perfil</label>
+            <input type="text" data-key="photo" id="input-photo-url" placeholder="Link de la imagen">
+            <label class="file-upload-btn">
+                <i class="fa-solid fa-camera mr-2"></i> Subir Foto de Perfil
+                <input type="file" class="hidden" accept="image/*" onchange="handleFileUpload(this, 'photo')">
+            </label>
         </div>
 
         <hr class="border-white/10 my-6">
+
+        <!-- APARIENCIA -->
+        <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Apariencia</h3>
+        <div class="input-group">
+            <label>Imagen de Fondo</label>
+            <input type="text" data-key="bgImg" id="input-bg-url" placeholder="Link del fondo">
+            <label class="file-upload-btn">
+                <i class="fa-solid fa-image mr-2"></i> Subir Imagen de Fondo
+                <input type="file" class="hidden" accept="image/*" onchange="handleFileUpload(this, 'bgImg')">
+            </label>
+        </div>
+
+        <hr class="border-white/10 my-6">
+        
         <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Botones y Links</h3>
         <div class="input-group"><label>WhatsApp (solo números)</label><input type="text" data-key="whatsapp"></div>
         <div class="input-group"><label>Link Facebook</label><input type="text" data-key="facebook"></div>
@@ -268,29 +268,28 @@
         <header class="flex flex-col items-center text-center">
             <div class="relative mb-6">
                 <div class="absolute inset-0 gold-gradient rounded-full blur-[3px]"></div>
-                <!-- EL GESTO SECRETO SE HACE AQUÍ: 5 CLICKS -->
                 <img id="ui-photo" src="" alt="Perfil" onclick="handleSecretTap()" class="relative w-36 h-36 rounded-full border-4 border-[#D4AF37] object-cover shadow-2xl cursor-pointer">
             </div>
-            <h1 id="ui-name" class="text-3xl font-bold tracking-tight mb-2"></h1>
+            <h1 id="ui-name" class="text-3xl font-bold tracking-tight mb-2 text-white"></h1>
             <p id="ui-role" class="gold-text text-sm font-semibold uppercase tracking-[0.25em] mb-4"></p>
             <div class="w-12 h-[1px] bg-white/20 mb-4"></div>
             <p id="ui-bio" class="text-gray-300 text-sm italic font-light max-w-[300px] leading-relaxed"></p>
         </header>
 
         <section id="ui-actions-grid" class="grid grid-cols-2 gap-4 w-full">
-            <a id="link-wa" href="#" target="_blank" class="btn-action flex flex-col items-center justify-center py-5 px-2 rounded-2xl">
+            <a id="link-wa" href="#" target="_blank" class="btn-action flex flex-col items-center justify-center py-5 px-2 rounded-2xl text-white">
                 <i class="fa-brands fa-whatsapp text-2xl mb-2 text-green-400"></i>
                 <span class="text-[10px] font-bold uppercase tracking-[0.1em]">WhatsApp</span>
             </a>
-            <a id="link-fb" href="#" target="_blank" class="btn-action flex flex-col items-center justify-center py-5 px-2 rounded-2xl">
+            <a id="link-fb" href="#" target="_blank" class="btn-action flex flex-col items-center justify-center py-5 px-2 rounded-2xl text-white">
                 <i class="fa-brands fa-facebook text-2xl mb-2 text-blue-500"></i>
                 <span class="text-[10px] font-bold uppercase tracking-[0.1em]">Facebook</span>
             </a>
-            <a id="link-maps" href="#" target="_blank" class="btn-action flex flex-col items-center justify-center py-5 px-2 rounded-2xl">
+            <a id="link-maps" href="#" target="_blank" class="btn-action flex flex-col items-center justify-center py-5 px-2 rounded-2xl text-white">
                 <i class="fa-solid fa-location-dot text-2xl mb-2 text-red-400"></i>
                 <span class="text-[10px] font-bold uppercase tracking-[0.1em]">Ubicación</span>
             </a>
-            <a id="link-site" href="#" target="_blank" class="btn-action flex flex-col items-center justify-center py-5 px-2 rounded-2xl">
+            <a id="link-site" href="#" target="_blank" class="btn-action flex flex-col items-center justify-center py-5 px-2 rounded-2xl text-white">
                 <i class="fa-solid fa-globe text-2xl mb-2 text-white"></i>
                 <span class="text-[10px] font-bold uppercase tracking-[0.1em]">Sitio Web</span>
             </a>
@@ -311,7 +310,7 @@
     <div class="admin-hint">Tip: Toca 5 veces la foto de perfil</div>
 
     <script>
-        const STORAGE_KEY = 'vcard_pro_v10';
+        const STORAGE_KEY = 'vcard_pro_v11';
         const defaultConfig = {
             name: "Ricardo Silva",
             role: "Asesor Inmobiliario de Lujo",
@@ -329,16 +328,13 @@
         let tapCount = 0;
         let tapTimer = null;
 
-        // Soporte Unicode para links
         function encodeData(obj) { return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }
         function decodeData(str) { return JSON.parse(decodeURIComponent(escape(atob(str)))); }
 
-        // Gesto Secreto
         function handleSecretTap() {
             tapCount++;
             clearTimeout(tapTimer);
             tapTimer = setTimeout(() => { tapCount = 0; }, 2000);
-
             if (tapCount >= 5) {
                 document.getElementById('btn-settings').style.display = 'flex';
                 alert("¡Modo Administrador Activado!");
@@ -346,10 +342,24 @@
             }
         }
 
+        function handleFileUpload(input, key) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Image = e.target.result;
+                    config[key] = base64Image;
+                    // Actualizar el campo de texto para mostrar que hay algo cargado
+                    const inputTarget = document.querySelector(`input[data-key="${key}"]`);
+                    if(inputTarget) inputTarget.value = "Imagen Cargada (Local)";
+                    updateUI();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         function init() {
             const urlParams = new URLSearchParams(window.location.search);
-            
-            // 1. Ver se há dados no link
             const sharedData = urlParams.get('d');
             if (sharedData) {
                 try {
@@ -361,7 +371,6 @@
                 config = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultConfig;
             }
 
-            // 2. Se for link de admin direto
             if (urlParams.has('admin')) {
                 document.getElementById('btn-settings').style.display = 'flex';
             }
@@ -392,7 +401,7 @@
             document.querySelectorAll('#editor-panel [data-key]').forEach(el => {
                 const key = el.getAttribute('data-key');
                 if (el.type === 'checkbox') el.checked = !!config[key];
-                else el.value = config[key] || "";
+                else el.value = config[key] && config[key].startsWith('data:image') ? "Imagen Cargada (Local)" : (config[key] || "");
             });
         }
 
@@ -400,7 +409,12 @@
             document.querySelectorAll('#editor-panel [data-key]').forEach(el => {
                 const key = el.getAttribute('data-key');
                 if (el.type === 'checkbox') config[key] = el.checked;
-                else config[key] = el.value;
+                else {
+                    // Solo actualizamos si no dice "Imagen Cargada" (para no borrar el base64 accidentalmente)
+                    if (el.value !== "Imagen Cargada (Local)") {
+                        config[key] = el.value;
+                    }
+                }
             });
             localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
             updateUI();
@@ -408,13 +422,10 @@
         }
 
         function generateShareLink() {
-            // Asegurar que guardamos antes de generar
             saveChanges();
-            
             const b64 = encodeData(config);
             const baseUrl = window.location.href.split('?')[0];
             const shareUrl = `${baseUrl}?d=${b64}`;
-
             navigator.clipboard.writeText(shareUrl).then(() => {
                 alert("¡Link de compartir copiado! Envíalo por WhatsApp a tus clientes.");
             });
