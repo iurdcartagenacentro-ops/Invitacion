@@ -36,7 +36,6 @@
             overflow-x: hidden;
         }
 
-        /* Background */
         .bg-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -54,7 +53,6 @@
             z-index: -1;
         }
 
-        /* Glassmorphism Card */
         .glass-card {
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
@@ -83,7 +81,6 @@
         }
         .btn-action:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.15); }
 
-        /* Slider Styles */
         .slider-container {
             width: 100%;
             height: 200px;
@@ -102,9 +99,7 @@
             opacity: 0;
             transition: opacity 1s ease-in-out;
         }
-        .slider-image.active {
-            opacity: 1;
-        }
+        .slider-image.active { opacity: 1; }
         .slider-dots {
             position: absolute;
             bottom: 12px;
@@ -125,7 +120,6 @@
             border-radius: 10px;
         }
 
-        /* Panel Editor */
         #editor-panel {
             position: fixed;
             top: 0; right: -100%;
@@ -181,7 +175,7 @@
             background: rgba(255, 255, 255, 0.1);
             width: 44px; height: 44px;
             border-radius: 50%;
-            display: flex;
+            display: none;
             align-items: center; justify-content: center;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -231,85 +225,66 @@
 
     <aside id="editor-panel">
         <div class="flex justify-between items-center mb-8">
-            <h2 class="text-xl font-bold gold-text">Configuración</h2>
+            <h2 class="text-xl font-bold gold-text">Modo Administrador</h2>
             <button onclick="toggleEditor()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
         </div>
 
-        <!-- Identidad -->
+        <div class="p-4 bg-gold/10 border border-gold/30 rounded-xl mb-8">
+            <h3 class="text-[10px] gold-text uppercase font-bold mb-2 tracking-widest">Enviar a Clientes</h3>
+            <p class="text-[10px] text-gray-400 mb-4">Usa este botón para copiar el link con tus datos y enviarlo. Tus clientes NO verán este menú.</p>
+            <button onclick="generateShareLink()" class="w-full py-3 bg-gold text-black font-bold text-[10px] uppercase rounded-lg shadow-lg hover:brightness-110 transition-all">
+                <i class="fa-solid fa-share-nodes mr-2"></i> Copiar Link de Compartir
+            </button>
+        </div>
+
         <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Identidad</h3>
-        <div class="input-group">
-            <label>Nombre</label>
-            <input type="text" data-key="name">
-        </div>
-        <div class="input-group">
-            <label>Cargo</label>
-            <input type="text" data-key="role">
-        </div>
-        <div class="input-group">
-            <label>Biografía</label>
-            <textarea data-key="bio" rows="2"></textarea>
-        </div>
+        <div class="input-group"><label>Nombre</label><input type="text" data-key="name"></div>
+        <div class="input-group"><label>Cargo</label><input type="text" data-key="role"></div>
+        <div class="input-group"><label>Biografía</label><textarea data-key="bio" rows="2"></textarea></div>
         <div class="input-group">
             <label>Foto de Perfil</label>
-            <input type="text" data-key="photo" placeholder="URL o sube un archivo">
+            <input type="text" data-key="photo" placeholder="URL">
             <label class="file-upload-btn"><i class="fa-solid fa-upload mr-2"></i> Subir Foto <input type="file" onchange="handleFileUpload(this, 'photo')" class="hidden"></label>
         </div>
 
         <hr class="border-white/10 my-6">
-        <!-- Apariencia -->
         <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Apariencia</h3>
         <div class="input-group">
             <label>Imagen de Fondo</label>
-            <input type="text" data-key="bgImg" placeholder="URL o sube un archivo">
+            <input type="text" data-key="bgImg" placeholder="URL">
             <label class="file-upload-btn"><i class="fa-solid fa-image mr-2"></i> Subir Fondo <input type="file" onchange="handleFileUpload(this, 'bgImg')" class="hidden"></label>
         </div>
 
         <hr class="border-white/10 my-6">
-        <!-- Fotos Local -->
-        <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Fotos del Local</h3>
-        <div class="input-group">
-            <label>Foto 1</label>
-            <input type="text" data-key="placePhoto1">
-            <label class="file-upload-btn"><input type="file" onchange="handleFileUpload(this, 'placePhoto1')" class="hidden">Subir Imagen</label>
-        </div>
-        <div class="input-group">
-            <label>Foto 2</label>
-            <input type="text" data-key="placePhoto2">
-            <label class="file-upload-btn"><input type="file" onchange="handleFileUpload(this, 'placePhoto2')" class="hidden">Subir Imagen</label>
-        </div>
-        <div class="input-group">
-            <label>Foto 3</label>
-            <input type="text" data-key="placePhoto3">
-            <label class="file-upload-btn"><input type="file" onchange="handleFileUpload(this, 'placePhoto3')" class="hidden">Subir Imagen</label>
-        </div>
+        <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Fotos del Local (Slider)</h3>
+        <div class="input-group"><label>Foto 1</label><input type="text" data-key="placePhoto1"><label class="file-upload-btn"><input type="file" onchange="handleFileUpload(this, 'placePhoto1')" class="hidden">Subir</label></div>
+        <div class="input-group"><label>Foto 2</label><input type="text" data-key="placePhoto2"><label class="file-upload-btn"><input type="file" onchange="handleFileUpload(this, 'placePhoto2')" class="hidden">Subir</label></div>
+        <div class="input-group"><label>Foto 3</label><input type="text" data-key="placePhoto3"><label class="file-upload-btn"><input type="file" onchange="handleFileUpload(this, 'placePhoto3')" class="hidden">Subir</label></div>
 
         <hr class="border-white/10 my-6">
-        <!-- Visibilidad -->
         <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Visibilidad</h3>
         <div class="toggle-row"><span>WhatsApp</span><label class="switch"><input type="checkbox" data-key="showWa"><span class="slider"></span></label></div>
         <div class="toggle-row"><span>Facebook</span><label class="switch"><input type="checkbox" data-key="showFb"><span class="slider"></span></label></div>
         <div class="toggle-row"><span>Ubicación</span><label class="switch"><input type="checkbox" data-key="showMaps"><span class="slider"></span></label></div>
         <div class="toggle-row"><span>Sitio Web</span><label class="switch"><input type="checkbox" data-key="showSite"><span class="slider"></span></label></div>
-        <div class="toggle-row"><span>VCard (Contacto)</span><label class="switch"><input type="checkbox" data-key="showVcard"><span class="slider"></span></label></div>
-        <div class="toggle-row"><span>Slider de Fotos</span><label class="switch"><input type="checkbox" data-key="showSlider"><span class="slider"></span></label></div>
+        <div class="toggle-row"><span>VCard</span><label class="switch"><input type="checkbox" data-key="showVcard"><span class="slider"></span></label></div>
+        <div class="toggle-row"><span>Slider</span><label class="switch"><input type="checkbox" data-key="showSlider"><span class="slider"></span></label></div>
 
         <hr class="border-white/10 my-6">
-        <!-- Footer -->
         <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Copyright</h3>
         <div class="input-group"><label>Año</label><input type="text" data-key="footerYear"></div>
         <div class="input-group"><label>Empresa</label><input type="text" data-key="footerText"></div>
 
         <hr class="border-white/10 my-6">
-        <!-- Enlaces -->
-        <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Enlaces Directos</h3>
+        <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">URLs</h3>
         <div class="input-group"><label>WhatsApp (solo números)</label><input type="text" data-key="whatsapp"></div>
         <div class="input-group"><label>Link Facebook</label><input type="text" data-key="facebook"></div>
         <div class="input-group"><label>Link Web</label><input type="text" data-key="site"></div>
-        <div class="input-group"><label>Link Google Maps</label><input type="text" data-key="maps"></div>
+        <div class="input-group"><label>Link Maps</label><input type="text" data-key="maps"></div>
 
         <div class="flex flex-col gap-3 mt-10 mb-20">
-            <button id="btn-save" onclick="saveChanges()" class="w-full py-4 gold-gradient text-black font-extrabold rounded-xl text-xs uppercase tracking-widest shadow-xl active:scale-95 transition-transform">Guardar Cambios</button>
-            <button onclick="resetDefaults()" class="w-full py-3 bg-white/5 border border-white/10 text-gray-500 font-bold rounded-xl text-[10px] uppercase">Restablecer Original</button>
+            <button id="btn-save" onclick="saveChanges()" class="w-full py-4 gold-gradient text-black font-extrabold rounded-xl text-xs uppercase tracking-widest shadow-xl">Guardar Localmente</button>
+            <button onclick="resetDefaults()" class="w-full py-3 bg-white/5 border border-white/10 text-gray-500 font-bold rounded-xl text-[10px] uppercase">Restablecer Todo</button>
         </div>
     </aside>
 
@@ -367,7 +342,7 @@
     </main>
 
     <script>
-        const STORAGE_KEY = 'vcard_pro_final_v6';
+        const STORAGE_KEY = 'vcard_pro_final_v8';
         const defaultConfig = {
             name: "Ricardo Silva",
             role: "Asesor Inmobiliario de Lujo",
@@ -386,12 +361,42 @@
             showWa: true, showFb: true, showMaps: true, showSite: true, showVcard: true, showSlider: true
         };
 
-        // Cargar configuración desde LocalStorage
-        let config = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultConfig;
+        let config = defaultConfig;
         let sliderInterval = null;
         let currentSlide = 0;
 
-        // Actualiza solo la visualización de la tarjeta
+        // Soporte para caracteres Unicode en Base64
+        function utf8_to_b64(str) {
+            return btoa(unescape(encodeURIComponent(str)));
+        }
+
+        function b64_to_utf8(str) {
+            return decodeURIComponent(escape(atob(str)));
+        }
+
+        function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.has('admin')) {
+                document.getElementById('btn-settings').style.display = 'flex';
+            }
+
+            const sharedData = urlParams.get('d');
+            if (sharedData) {
+                try {
+                    config = JSON.parse(b64_to_utf8(sharedData));
+                } catch (e) {
+                    console.error("Error al cargar datos compartidos");
+                    config = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultConfig;
+                }
+            } else {
+                config = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultConfig;
+            }
+
+            updateCardVisuals();
+            syncEditorFromConfig();
+        }
+
         function updateCardVisuals() {
             document.getElementById('ui-name').innerText = config.name;
             document.getElementById('ui-role').innerText = config.role;
@@ -416,16 +421,11 @@
             initSlider();
         }
 
-        // Sincroniza los campos del editor con la configuración actual
         function syncEditorFromConfig() {
             document.querySelectorAll('#editor-panel [data-key]').forEach(el => {
                 const key = el.getAttribute('data-key');
-                if (el.type === 'checkbox') {
-                    el.checked = !!config[key];
-                } else {
-                    const value = config[key] || "";
-                    el.value = value.toString().startsWith('data:image') ? "[Imagen Cargada]" : value;
-                }
+                if (el.type === 'checkbox') el.checked = !!config[key];
+                else el.value = (config[key] || "").toString().startsWith('data:image') ? "[Imagen Cargada]" : (config[key] || "");
             });
         }
 
@@ -444,7 +444,6 @@
                 img.src = src;
                 img.className = `slider-image ${idx === 0 ? 'active' : ''}`;
                 container.insertBefore(img, dotsContainer);
-
                 const dot = document.createElement('div');
                 dot.className = `dot ${idx === 0 ? 'active' : ''}`;
                 dotsContainer.appendChild(dot);
@@ -457,7 +456,6 @@
                     const imgs = container.querySelectorAll('.slider-image');
                     const dots = dotsContainer.querySelectorAll('.dot');
                     if(imgs.length === 0) return;
-                    
                     imgs[currentSlide].classList.remove('active');
                     dots[currentSlide].classList.remove('active');
                     currentSlide = (currentSlide + 1) % imgs.length;
@@ -467,70 +465,56 @@
             }
         }
 
-        // Manejo de carga de archivos (sin sobrescribir otros campos del editor)
+        function generateShareLink() {
+            document.querySelectorAll('#editor-panel [data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (el.type === 'checkbox') config[key] = el.checked;
+                else if (el.value !== "[Imagen Cargada]") config[key] = el.value;
+            });
+
+            const b64Data = utf8_to_b64(JSON.stringify(config));
+            const baseUrl = window.location.href.split('?')[0];
+            const shareUrl = `${baseUrl}?d=${b64Data}`;
+
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert("¡Link de compartir copiado! Envíalo a tus clientes.");
+            });
+        }
+
         function handleFileUpload(input, key) {
             const file = input.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     config[key] = e.target.result;
-                    // Actualizamos visualmente el input de texto correspondiente
                     const textInput = document.querySelector(`input[data-key="${key}"]`);
                     if(textInput) textInput.value = "[Imagen Cargada]";
-                    // Solo actualizamos la tarjeta visualmente, no todo el editor
                     updateCardVisuals();
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function toggleEditor() { 
-            const panel = document.getElementById('editor-panel');
-            const isOpen = panel.classList.contains('open');
-            if (!isOpen) syncEditorFromConfig(); // Sincronizar al abrir
-            panel.classList.toggle('open'); 
-        }
-
+        function toggleEditor() { document.getElementById('editor-panel').classList.toggle('open'); }
         document.getElementById('btn-settings').addEventListener('click', toggleEditor);
 
-        // FUNCIÓN PRINCIPAL DE GUARDADO
         function saveChanges() {
-            const btn = document.getElementById('btn-save');
-            btn.innerText = "Guardando...";
-            
-            // Recoger todos los valores del editor
             document.querySelectorAll('#editor-panel [data-key]').forEach(el => {
                 const key = el.getAttribute('data-key');
-                if (el.type === 'checkbox') {
-                    config[key] = el.checked;
-                } else {
-                    // Solo guardamos si no es el placeholder de imagen
-                    if (el.value !== "[Imagen Cargada]") {
-                        config[key] = el.value;
-                    }
-                }
+                if (el.type === 'checkbox') config[key] = el.checked;
+                else if (el.value !== "[Imagen Cargada]") config[key] = el.value;
             });
-
-            // Persistencia real
             localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-            
-            // Refrescar UI
             updateCardVisuals();
-            
-            setTimeout(() => {
-                btn.innerText = "Guardar Cambios";
-                toggleEditor();
-                alert('¡Datos guardados correctamente!');
-            }, 300);
+            alert('¡Guardado en este navegador!');
         }
 
         function resetDefaults() {
-            if(confirm('¿Seguro que deseas restablecer todos los valores originales?')) {
+            if(confirm('¿Restablecer todo?')) {
                 config = {...defaultConfig};
                 localStorage.removeItem(STORAGE_KEY);
                 updateCardVisuals();
                 syncEditorFromConfig();
-                toggleEditor();
             }
         }
 
@@ -544,8 +528,7 @@
             link.click();
         });
 
-        // Inicialización
-        updateCardVisuals();
+        init();
     </script>
 </body>
 </html>
