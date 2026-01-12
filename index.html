@@ -1,0 +1,551 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarjeta Digital | Personalizable</title>
+    
+    <!-- Google Fonts: Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #F1D592;
+            --gold-dark: #B8860B;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0a0a0a;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Background */
+        .bg-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.4;
+            z-index: -2;
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        .bg-gradient-dark {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.4), rgba(0,0,0,0.8));
+            z-index: -1;
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            border-radius: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            padding: 3rem 2rem;
+            margin: 2rem 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+        .gold-gradient { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold-dark) 100%); }
+        .gold-text { color: var(--gold); }
+
+        .btn-action {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .btn-action:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.15); }
+
+        /* Slider Styles */
+        .slider-container {
+            width: 100%;
+            height: 200px;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0,0,0,0.2);
+        }
+        .slider-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0; left: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .slider-image.active {
+            opacity: 1;
+        }
+        .slider-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+        }
+        .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+        .dot.active {
+            background: var(--gold);
+            width: 15px;
+            border-radius: 10px;
+        }
+
+        /* Panel Editor */
+        #editor-panel {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 100%; max-width: 380px;
+            height: 100vh;
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(25px);
+            z-index: 100;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+        }
+        #editor-panel.open { right: 0; }
+
+        .input-group { margin-bottom: 1.25rem; }
+        .input-group label { display: block; font-size: 10px; color: var(--gold); text-transform: uppercase; margin-bottom: 4px; font-weight: bold; letter-spacing: 0.1em; }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: white;
+            font-size: 12px;
+            outline: none;
+        }
+        .input-group input:focus { border-color: var(--gold); }
+
+        .file-upload-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px dashed rgba(212, 175, 55, 0.5);
+            border-radius: 8px;
+            color: var(--gold);
+            font-size: 9px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: all 0.3s ease;
+            width: 100%;
+            justify-content: center;
+            text-transform: uppercase;
+        }
+        .file-upload-btn:hover { background: rgba(212, 175, 55, 0.2); border-color: var(--gold); }
+
+        #btn-settings {
+            position: fixed;
+            top: 1.5rem; right: 1.5rem;
+            z-index: 60;
+            background: rgba(255, 255, 255, 0.1);
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            color: white;
+        }
+
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.03);
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .toggle-row span { font-size: 11px; color: #ccc; }
+        .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333; transition: .4s; border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute; content: "";
+            height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--gold); }
+        input:checked + .slider:before { transform: translateX(14px); }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
+</head>
+<body>
+
+    <button id="btn-settings" title="Configurar Tarjeta">
+        <i class="fa-solid fa-sliders"></i>
+    </button>
+
+    <aside id="editor-panel">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-xl font-bold gold-text">Configuración</h2>
+            <button onclick="toggleEditor()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+
+        <!-- Identidad -->
+        <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Identidad</h3>
+        <div class="input-group">
+            <label>Nombre</label>
+            <input type="text" data-key="name">
+        </div>
+        <div class="input-group">
+            <label>Cargo</label>
+            <input type="text" data-key="role">
+        </div>
+        <div class="input-group">
+            <label>Biografía</label>
+            <textarea data-key="bio" rows="2"></textarea>
+        </div>
+        <div class="input-group">
+            <label>Foto de Perfil</label>
+            <input type="text" data-key="photo" placeholder="URL o sube un archivo">
+            <label class="file-upload-btn"><i class="fa-solid fa-upload mr-2"></i> Subir Foto <input type="file" onchange="handleFileUpload(this, 'photo')" class="hidden"></label>
+        </div>
+
+        <hr class="border-white/10 my-6">
+        <!-- Apariencia -->
+        <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Apariencia</h3>
+        <div class="input-group">
+            <label>Imagen de Fondo</label>
+            <input type="text" data-key="bgImg" placeholder="URL o sube un archivo">
+            <label class="file-upload-btn"><i class="fa-solid fa-image mr-2"></i> Subir Fondo <input type="file" onchange="handleFileUpload(this, 'bgImg')" class="hidden"></label>
+        </div>
+
+        <hr class="border-white/10 my-6">
+        <!-- Fotos Local -->
+        <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Fotos del Local</h3>
+        <div class="input-group">
+            <label>Foto 1</label>
+            <input type="text" data-key="placePhoto1">
+            <label class="file-upload-btn"><input type="file" onchange="handleFileUpload(this, 'placePhoto1')" class="hidden">Subir Imagen</label>
+        </div>
+        <div class="input-group">
+            <label>Foto 2</label>
+            <input type="text" data-key="placePhoto2">
+            <label class="file-upload-btn"><input type="file" onchange="handleFileUpload(this, 'placePhoto2')" class="hidden">Subir Imagen</label>
+        </div>
+        <div class="input-group">
+            <label>Foto 3</label>
+            <input type="text" data-key="placePhoto3">
+            <label class="file-upload-btn"><input type="file" onchange="handleFileUpload(this, 'placePhoto3')" class="hidden">Subir Imagen</label>
+        </div>
+
+        <hr class="border-white/10 my-6">
+        <!-- Visibilidad -->
+        <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Visibilidad</h3>
+        <div class="toggle-row"><span>WhatsApp</span><label class="switch"><input type="checkbox" data-key="showWa"><span class="slider"></span></label></div>
+        <div class="toggle-row"><span>Facebook</span><label class="switch"><input type="checkbox" data-key="showFb"><span class="slider"></span></label></div>
+        <div class="toggle-row"><span>Ubicación</span><label class="switch"><input type="checkbox" data-key="showMaps"><span class="slider"></span></label></div>
+        <div class="toggle-row"><span>Sitio Web</span><label class="switch"><input type="checkbox" data-key="showSite"><span class="slider"></span></label></div>
+        <div class="toggle-row"><span>VCard (Contacto)</span><label class="switch"><input type="checkbox" data-key="showVcard"><span class="slider"></span></label></div>
+        <div class="toggle-row"><span>Slider de Fotos</span><label class="switch"><input type="checkbox" data-key="showSlider"><span class="slider"></span></label></div>
+
+        <hr class="border-white/10 my-6">
+        <!-- Footer -->
+        <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Copyright</h3>
+        <div class="input-group"><label>Año</label><input type="text" data-key="footerYear"></div>
+        <div class="input-group"><label>Empresa</label><input type="text" data-key="footerText"></div>
+
+        <hr class="border-white/10 my-6">
+        <!-- Enlaces -->
+        <h3 class="text-[10px] gold-text uppercase mb-4 tracking-[0.3em] font-bold">Enlaces Directos</h3>
+        <div class="input-group"><label>WhatsApp (solo números)</label><input type="text" data-key="whatsapp"></div>
+        <div class="input-group"><label>Link Facebook</label><input type="text" data-key="facebook"></div>
+        <div class="input-group"><label>Link Web</label><input type="text" data-key="site"></div>
+        <div class="input-group"><label>Link Google Maps</label><input type="text" data-key="maps"></div>
+
+        <div class="flex flex-col gap-3 mt-10 mb-20">
+            <button id="btn-save" onclick="saveChanges()" class="w-full py-4 gold-gradient text-black font-extrabold rounded-xl text-xs uppercase tracking-widest shadow-xl active:scale-95 transition-transform">Guardar Cambios</button>
+            <button onclick="resetDefaults()" class="w-full py-3 bg-white/5 border border-white/10 text-gray-500 font-bold rounded-xl text-[10px] uppercase">Restablecer Original</button>
+        </div>
+    </aside>
+
+    <div class="bg-overlay" id="ui-bg-overlay"></div>
+    <div class="bg-gradient-dark"></div>
+
+    <main class="glass-card flex flex-col items-center gap-10">
+        <header class="flex flex-col items-center text-center">
+            <div class="relative mb-6">
+                <div class="absolute inset-0 gold-gradient rounded-full blur-[3px]"></div>
+                <img id="ui-photo" src="" alt="Perfil" class="relative w-36 h-36 rounded-full border-4 border-[#D4AF37] object-cover shadow-2xl">
+            </div>
+            <h1 id="ui-name" class="text-3xl font-bold tracking-tight mb-2"></h1>
+            <p id="ui-role" class="gold-text text-sm font-semibold uppercase tracking-[0.25em] mb-4"></p>
+            <div class="w-12 h-[1px] bg-white/20 mb-4"></div>
+            <p id="ui-bio" class="text-gray-300 text-sm italic font-light max-w-[300px] leading-relaxed"></p>
+        </header>
+
+        <section id="ui-actions-grid" class="grid grid-cols-2 gap-4 w-full">
+            <a id="link-wa" href="#" target="_blank" class="btn-action flex flex-col items-center justify-center py-5 px-2 rounded-2xl">
+                <i class="fa-brands fa-whatsapp text-2xl mb-2 text-green-400"></i>
+                <span class="text-[10px] font-bold uppercase tracking-[0.1em]">WhatsApp</span>
+            </a>
+            <a id="link-fb" href="#" target="_blank" class="btn-action flex flex-col items-center justify-center py-5 px-2 rounded-2xl">
+                <i class="fa-brands fa-facebook text-2xl mb-2 text-blue-500"></i>
+                <span class="text-[10px] font-bold uppercase tracking-[0.1em]">Facebook</span>
+            </a>
+            <a id="link-maps" href="#" target="_blank" class="btn-action flex flex-col items-center justify-center py-5 px-2 rounded-2xl">
+                <i class="fa-solid fa-location-dot text-2xl mb-2 text-red-400"></i>
+                <span class="text-[10px] font-bold uppercase tracking-[0.1em]">Ubicación</span>
+            </a>
+            <a id="link-site" href="#" target="_blank" class="btn-action flex flex-col items-center justify-center py-5 px-2 rounded-2xl">
+                <i class="fa-solid fa-globe text-2xl mb-2 text-white"></i>
+                <span class="text-[10px] font-bold uppercase tracking-[0.1em]">Sitio Web</span>
+            </a>
+        </section>
+
+        <button id="btn-vcard" class="w-full py-5 gold-gradient rounded-2xl text-black font-extrabold text-sm tracking-[0.2em] uppercase shadow-[0_15px_30px_rgba(212,175,55,0.25)] hover:brightness-110 active:scale-[0.98] transition-all">
+            <i class="fa-solid fa-id-card-clip mr-2"></i>
+            Guardar Contacto
+        </button>
+
+        <section id="ui-slider-section" class="w-full flex flex-col gap-3">
+            <h3 class="text-[10px] gold-text font-bold uppercase tracking-[0.3em] pl-1">Nuestro Espacio</h3>
+            <div class="slider-container" id="slider-root">
+                <div class="slider-dots" id="slider-dots"></div>
+            </div>
+        </section>
+
+        <footer class="flex flex-col items-center gap-6 w-full pt-4 border-t border-white/10">
+            <p class="text-[9px] text-gray-500 font-medium tracking-[0.4em] uppercase text-center">
+                © <span id="ui-footer-year"></span> <span id="ui-footer-text"></span>
+            </p>
+        </footer>
+    </main>
+
+    <script>
+        const STORAGE_KEY = 'vcard_pro_final_v6';
+        const defaultConfig = {
+            name: "Ricardo Silva",
+            role: "Asesor Inmobiliario de Lujo",
+            bio: "\"Transformando sueños en direcciones exclusivas.\"",
+            photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=256&h=256",
+            bgImg: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1920",
+            whatsapp: "5511999999999",
+            facebook: "https://facebook.com",
+            site: "https://www.ricardosilva.com.br",
+            maps: "https://maps.google.com",
+            footerYear: "2026",
+            footerText: "Universal Centro",
+            placePhoto1: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800",
+            placePhoto2: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&q=80&w=800",
+            placePhoto3: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=800",
+            showWa: true, showFb: true, showMaps: true, showSite: true, showVcard: true, showSlider: true
+        };
+
+        // Cargar configuración desde LocalStorage
+        let config = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultConfig;
+        let sliderInterval = null;
+        let currentSlide = 0;
+
+        // Actualiza solo la visualización de la tarjeta
+        function updateCardVisuals() {
+            document.getElementById('ui-name').innerText = config.name;
+            document.getElementById('ui-role').innerText = config.role;
+            document.getElementById('ui-bio').innerText = config.bio;
+            document.getElementById('ui-photo').src = config.photo;
+            document.getElementById('ui-bg-overlay').style.backgroundImage = `url('${config.bgImg}')`;
+            document.getElementById('ui-footer-year').innerText = config.footerYear;
+            document.getElementById('ui-footer-text').innerText = config.footerText;
+            
+            document.getElementById('link-wa').href = `https://wa.me/${config.whatsapp}`;
+            document.getElementById('link-fb').href = config.facebook;
+            document.getElementById('link-site').href = config.site;
+            document.getElementById('link-maps').href = config.maps;
+
+            document.getElementById('link-wa').style.display = config.showWa ? 'flex' : 'none';
+            document.getElementById('link-fb').style.display = config.showFb ? 'flex' : 'none';
+            document.getElementById('link-maps').style.display = config.showMaps ? 'flex' : 'none';
+            document.getElementById('link-site').style.display = config.showSite ? 'flex' : 'none';
+            document.getElementById('btn-vcard').style.display = config.showVcard ? 'block' : 'none';
+            document.getElementById('ui-slider-section').style.display = config.showSlider ? 'flex' : 'none';
+
+            initSlider();
+        }
+
+        // Sincroniza los campos del editor con la configuración actual
+        function syncEditorFromConfig() {
+            document.querySelectorAll('#editor-panel [data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (el.type === 'checkbox') {
+                    el.checked = !!config[key];
+                } else {
+                    const value = config[key] || "";
+                    el.value = value.toString().startsWith('data:image') ? "[Imagen Cargada]" : value;
+                }
+            });
+        }
+
+        function initSlider() {
+            const container = document.getElementById('slider-root');
+            const dotsContainer = document.getElementById('slider-dots');
+            const photos = [config.placePhoto1, config.placePhoto2, config.placePhoto3].filter(p => p);
+            
+            container.querySelectorAll('.slider-image').forEach(img => img.remove());
+            dotsContainer.innerHTML = '';
+            
+            if (photos.length === 0 || !config.showSlider) return;
+
+            photos.forEach((src, idx) => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.className = `slider-image ${idx === 0 ? 'active' : ''}`;
+                container.insertBefore(img, dotsContainer);
+
+                const dot = document.createElement('div');
+                dot.className = `dot ${idx === 0 ? 'active' : ''}`;
+                dotsContainer.appendChild(dot);
+            });
+
+            currentSlide = 0;
+            if (sliderInterval) clearInterval(sliderInterval);
+            if (photos.length > 1) {
+                sliderInterval = setInterval(() => {
+                    const imgs = container.querySelectorAll('.slider-image');
+                    const dots = dotsContainer.querySelectorAll('.dot');
+                    if(imgs.length === 0) return;
+                    
+                    imgs[currentSlide].classList.remove('active');
+                    dots[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % imgs.length;
+                    imgs[currentSlide].classList.add('active');
+                    dots[currentSlide].classList.add('active');
+                }, 5000);
+            }
+        }
+
+        // Manejo de carga de archivos (sin sobrescribir otros campos del editor)
+        function handleFileUpload(input, key) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    config[key] = e.target.result;
+                    // Actualizamos visualmente el input de texto correspondiente
+                    const textInput = document.querySelector(`input[data-key="${key}"]`);
+                    if(textInput) textInput.value = "[Imagen Cargada]";
+                    // Solo actualizamos la tarjeta visualmente, no todo el editor
+                    updateCardVisuals();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function toggleEditor() { 
+            const panel = document.getElementById('editor-panel');
+            const isOpen = panel.classList.contains('open');
+            if (!isOpen) syncEditorFromConfig(); // Sincronizar al abrir
+            panel.classList.toggle('open'); 
+        }
+
+        document.getElementById('btn-settings').addEventListener('click', toggleEditor);
+
+        // FUNCIÓN PRINCIPAL DE GUARDADO
+        function saveChanges() {
+            const btn = document.getElementById('btn-save');
+            btn.innerText = "Guardando...";
+            
+            // Recoger todos los valores del editor
+            document.querySelectorAll('#editor-panel [data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (el.type === 'checkbox') {
+                    config[key] = el.checked;
+                } else {
+                    // Solo guardamos si no es el placeholder de imagen
+                    if (el.value !== "[Imagen Cargada]") {
+                        config[key] = el.value;
+                    }
+                }
+            });
+
+            // Persistencia real
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+            
+            // Refrescar UI
+            updateCardVisuals();
+            
+            setTimeout(() => {
+                btn.innerText = "Guardar Cambios";
+                toggleEditor();
+                alert('¡Datos guardados correctamente!');
+            }, 300);
+        }
+
+        function resetDefaults() {
+            if(confirm('¿Seguro que deseas restablecer todos los valores originales?')) {
+                config = {...defaultConfig};
+                localStorage.removeItem(STORAGE_KEY);
+                updateCardVisuals();
+                syncEditorFromConfig();
+                toggleEditor();
+            }
+        }
+
+        document.getElementById('btn-vcard').addEventListener('click', function() {
+            const vcard = `BEGIN:VCARD\nVERSION:3.0\nFN:${config.name}\nTITLE:${config.role}\nTEL;TYPE=CELL:+${config.whatsapp}\nURL:${config.site}\nEND:VCARD`;
+            const blob = new Blob([vcard], { type: 'text/vcard' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Contacto_${config.name.replace(/\s/g, '_')}.vcf`;
+            link.click();
+        });
+
+        // Inicialización
+        updateCardVisuals();
+    </script>
+</body>
+</html>
